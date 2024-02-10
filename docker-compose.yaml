@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  auth_microservice:
+    container_name: auth_microservice
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5000:5000"
+      # - "5555:5555"
+      # - "7070:7070"
+    environment:
+      - PORT=5000
+    depends_on:
+      - postgesql
+      # - redis
+      # - prometheus
+      # - node_exporter
+      # - grafana
+    restart: always
+    volumes:
+      - ./:/app
+    networks:
+      - auth_network
+
+  postgesql:
+    image: postgres:13-alpine
+    container_name: auth_postgesql
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=auth_db
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - auth_network
+
+networks:
+  auth_network:
+    driver: bridge
