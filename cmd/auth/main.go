@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/Snorkin/auth_service/config"
-	authServer "github.com/Snorkin/auth_service/internal/server"
+	authServer "github.com/Snorkin/auth_service/internal/app"
 	"github.com/Snorkin/auth_service/pkg/postgres"
 )
 
@@ -21,9 +21,9 @@ func main() {
 		log.Fatalf("Cannot connect to pg database, %s\n", err)
 	}
 
-	server := authServer.CreateAuthServer(cfg, pgDB)
+	server := authServer.CreateAuthApp(cfg, pgDB)
 	err = server.Run()
 	if err != nil {
-		log.Fatalf("Cannot run the server")
+		log.Fatalf("Cannot run the app")
 	}
 }
