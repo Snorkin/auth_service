@@ -1,18 +1,29 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/Snorkin/auth_service/configs"
+	"github.com/Snorkin/auth_service/config"
+	authServer "github.com/Snorkin/auth_service/internal/server"
+	"github.com/Snorkin/auth_service/pkg/postgres"
 )
 
 func main() {
 	log.Println("Starting auth service")
 
-	cfg, err := configs.GetConfig(".env")
+	cfg, err := config.GetConfig(".env")
 	if err != nil {
 		log.Fatalln("Cannot load env variables")
 	}
-	fmt.Println(cfg)
+
+	pgDB, err := postgres.CreatePostgresDB(cfg)
+	if err != nil {
+		log.Fatalf("Cannot connect to pg database, %s\n", err)
+	}
+
+	server := authServer.CreateAuthServer(cfg, pgDB)
+	err = server.Run()
+	if err != nil {
+		log.Fatalf("Cannot run the server")
+	}
 }
