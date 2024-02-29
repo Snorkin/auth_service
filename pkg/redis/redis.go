@@ -21,6 +21,5 @@ func CreateRedisClient(cfg *config.Config) *redis.Client {
 		Password:     cfg.Redis.Password,
 		DB:           cfg.Redis.DB, // 0 for default
 	})
-
 	return client
 }
