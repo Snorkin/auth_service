@@ -80,9 +80,9 @@ func (s *ServerLogger) Init() {
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	s.sugar = logger.Sugar()
-	if err := s.sugar.Sync(); err != nil {
-		s.sugar.Error(err)
-	}
+	//if err := s.sugar.Sync(); err != nil {
+	//	s.sugar.Error(err)
+	//}
 }
 
 func (s *ServerLogger) Debug(args ...interface{}) {
