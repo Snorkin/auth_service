@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package userService;
+option go_package = ".;userService";
+
+message Session {
+  string session = 1;
+}
+
+message User {
+  string uuid = 1;
+  string name = 2;
+  string surname = 3;
+  string patronymic = 4;
+  string email = 5;
+  string login = 6;
+  string password = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message RegistrationReq {
+  string name = 1;
+  string surname = 2;
+  string patronymic = 3;
+  string email = 4;
+  string login = 5;
+  string password = 6;
+}
+
+message RegistrationRes {
+  User user = 1;
+}
+
+message FindByEmailReq {
+  string email = 1;
+}
+
+message FindByEmailRes {
+  User user = 1;
+}
+
+message FindByIdReq {
+  string uuid = 1;
+}
+
+message FindByIdRes {
+  User user = 1;
+}
+
+message LoginReq {
+  string email = 1;
+  string login = 2;
+  string password = 3;
+}
+
+message LoginRes {
+  User user = 1;
+  string session_id = 2;
+}
+
+
+message GetSelfReq{}
+
+message GetSelfRes {
+  User user = 1;
+}
+
+
+message LogoutReq{}
+
+message LogoutRes {}
+
+service UserService{
+  rpc Register(RegistrationReq) returns (RegistrationRes);
+  rpc FindByEmail(FindByEmailReq) returns (FindByEmailRes);
+  rpc FindById(FindByIdReq) returns (FindByIdRes);
+  rpc GetSelf(GetSelfReq) returns (GetSelfRes);
+  rpc Logout(LogoutReq) returns (LogoutRes);
+}
