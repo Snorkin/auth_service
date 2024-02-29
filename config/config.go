@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Config struct {
@@ -14,10 +15,14 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	AppVersion string
-	Port       string
-	PprofPort  string
-	Mode       string // Developer or Production TODO: add enum?
+	AppVersion  string
+	Port        string
+	PprofPort   string
+	Mode        string // Developer or Production TODO: add enum?
+	MaxConnIdle time.Duration
+	Timeout     time.Duration
+	MaxConnAge  time.Duration
+	Time        time.Duration
 }
 
 type PostgresConfig struct {
