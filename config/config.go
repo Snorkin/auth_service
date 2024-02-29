@@ -22,6 +22,7 @@ type ServerConfig struct {
 	Timeout     time.Duration
 	MaxConnAge  time.Duration
 	Time        time.Duration
+	SSL         bool
 }
 
 type PostgresConfig struct {
@@ -79,6 +80,7 @@ func GetConfig(path string) (*Config, error) {
 	cfg.Server.Timeout, _ = time.ParseDuration(os.Getenv("SERVER_TIMEOUT"))
 	cfg.Server.MaxConnAge, _ = time.ParseDuration(os.Getenv("SERVER_MAXCONNAGE"))
 	cfg.Server.Time, _ = time.ParseDuration(os.Getenv("SERVER_TIME"))
+	cfg.Server.SSL, _ = strconv.ParseBool(os.Getenv("SERVER_SSL"))
 
 	cfg.Postgres.Port = os.Getenv("DB_PORT")
 	cfg.Postgres.Host = os.Getenv("DB_HOST")
@@ -101,7 +103,9 @@ func GetConfig(path string) (*Config, error) {
 	}
 	cfg.Logger.Development = check
 	cfg.Logger.Encoding = os.Getenv("LOGGER_ENCODING")
-
+	cfg.Logger.Level = os.Getenv("LOGGER_LEVEL")
+	cfg.Logger.DisableStacktrace, _ = strconv.ParseBool(os.Getenv("LOGGER_DISABLESTACKTRACE"))
+	cfg.Logger.DisableCaller, _ = strconv.ParseBool(os.Getenv("LOGGER_DISABLECALLER"))
 	return &cfg, nil
 }
 
