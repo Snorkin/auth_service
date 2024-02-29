@@ -1,4 +1,4 @@
-package service
+package handlers
 
 import (
 	"github.com/Snorkin/auth_service/config"
@@ -7,7 +7,7 @@ import (
 	userService "github.com/Snorkin/auth_service/proto"
 )
 
-type UsersService struct {
+type UsersHandler struct {
 	logger logger.Logger
 	cfg    *config.Config
 	userUC user.Useсase
@@ -15,6 +15,6 @@ type UsersService struct {
 	//sessUC session.SessionUsecase
 }
 
-func NewAuthServiceGRPC(logger logger.Logger, cfg *config.Config, userUC user.Useсase) *UsersService {
-	return &UsersService{logger: logger, cfg: cfg, userUC: userUC}
+func NewAuthHandlerGRPC(logger logger.Logger, cfg *config.Config, userUC user.Useсase) *UsersHandler {
+	return &UsersHandler{logger: logger, cfg: cfg, userUC: userUC}
 }
