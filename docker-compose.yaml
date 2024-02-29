@@ -20,7 +20,7 @@ services:
       # - grafana
     restart: always
     volumes:
-      - ./:/server
+      - ./:/app
     networks:
       - auth_network
 
