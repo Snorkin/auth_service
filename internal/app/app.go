@@ -8,6 +8,7 @@ import (
 	"github.com/Snorkin/auth_service/pkg/interceptor"
 	"github.com/Snorkin/auth_service/pkg/logger"
 	grpcService "github.com/Snorkin/auth_service/proto"
+	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -23,10 +24,11 @@ type App struct {
 	logger logger.Logger
 	cfg    *config.Config
 	db     *sqlx.DB
+	redis  *redis.Client
 }
 
-func CreateAuthApp(cfg *config.Config, db *sqlx.DB) *App {
-	return &App{cfg: cfg, db: db}
+func CreateAuthApp(logger logger.Logger, cfg *config.Config, db *sqlx.DB, redis *redis.Client) *App {
+	return &App{logger: logger, cfg: cfg, db: db, redis: redis}
 }
 
 func (a *App) Run() error {
