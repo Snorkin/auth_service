@@ -1,4 +1,4 @@
-FROM golang:1.21
+FROM golang:1.22
 
 #ENV TZ=Europe/Moscow
 #RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -10,6 +10,8 @@ WORKDIR /app
 COPY ./ /app
 
 RUN go mod download
+
+RUN go install -mod=mod github.com/githubnemo/CompileDaemon
 
 RUN go get github.com/githubnemo/CompileDaemon
 
