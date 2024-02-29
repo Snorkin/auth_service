@@ -42,7 +42,7 @@ func (a *App) Run() error {
 			Time:              a.cfg.Server.Time * time.Minute,
 		}),
 		grpc.UnaryInterceptor(ic.Log))
-	if a.cfg.Server.Mode == "Production" {
+	if a.cfg.Server.Mode != "Production" {
 		reflection.Register(grpcServer)
 	}
 
