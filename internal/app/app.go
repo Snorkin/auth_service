@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/Snorkin/auth_service/config"
-	userService "github.com/Snorkin/auth_service/internal/user/delivery/grpc"
+	userHandler "github.com/Snorkin/auth_service/internal/user/delivery/grpc"
 	userRepository "github.com/Snorkin/auth_service/internal/user/repository"
 	userUsecase "github.com/Snorkin/auth_service/internal/user/usecase"
 	"github.com/Snorkin/auth_service/pkg/interceptor"
@@ -46,8 +46,8 @@ func (a *App) Run() error {
 		reflection.Register(grpcServer)
 	}
 
-	authServiceGRPC := userService.NewAuthServiceGRPC(a.logger, a.cfg, userUC)
-	grpcService.RegisterUserServiceServer(grpcServer, authServiceGRPC)
+	authHandlerGRPC := userHandler.NewAuthHandlerGRPC(a.logger, a.cfg, userUC)
+	grpcService.RegisterUserServiceServer(grpcServer, authHandlerGRPC)
 
 	listener, err := net.Listen("tcp", a.cfg.Server.Port)
 	if err != nil {
