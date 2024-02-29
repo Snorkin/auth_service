@@ -1,21 +1,23 @@
 package config
 
 import (
+	"github.com/joho/godotenv"
 	"os"
 	"strconv"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
 	Server   ServerConfig
 	Postgres PostgresConfig
+	Redis    RedisConfig
+	Logger   Logger
 }
 
 type ServerConfig struct {
 	AppVersion string
 	Port       string
 	PprofPort  string
+	Mode       string // Developer or Production TODO: add enum?
 }
 
 type PostgresConfig struct {
@@ -26,6 +28,36 @@ type PostgresConfig struct {
 	DBName   string
 	SSLMode  bool
 	PgDriver string
+}
+
+type RedisConfig struct {
+	Address      string
+	Password     string
+	MinIdleConns int
+	PoolSize     int
+	PoolTimeout  int
+	DB           int
+}
+
+type Logger struct {
+	Development       bool
+	DisableCaller     bool
+	DisableStacktrace bool
+	Encoding          string // Console or Json TODO: add enum?
+	Level             string
+}
+
+type Cookie struct {
+	Name     string
+	MaxAge   int
+	Secure   bool
+	HTTPOnly bool
+}
+
+type Session struct {
+	Prefix string
+	Name   string
+	Expire int
 }
 
 func GetConfig(path string) (*Config, error) {
