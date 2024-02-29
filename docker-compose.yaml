@@ -13,20 +13,20 @@ services:
     environment:
       - PORT=5000
     depends_on:
-      - postgesql
+      - postgresql
       # - redis
       # - prometheus
       # - node_exporter
       # - grafana
     restart: always
     volumes:
-      - ./:/app
+      - ./:/server
     networks:
       - auth_network
 
-  postgesql:
+  postgresql:
     image: postgres:13-alpine
-    container_name: auth_postgesql
+    container_name: auth_postgresql
     ports:
       - "5432:5432"
     restart: always
