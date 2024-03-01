@@ -8,9 +8,15 @@ import (
 )
 
 type PgRepository interface {
-	Create(ctx context.Context, user *models.User) (*models.User, error)
-	FindByEmail(ctx context.Context, user *models.User) (*models.User, error)
-	FindById(ctx context.Context, user *models.User) (*models.User, error)
+	CreateUser(ctx context.Context, user *models.User) (*models.User, error)
+	FindByEmail(ctx context.Context, email string) (*models.User, error)
+	FindById(ctx context.Context, id uuid.UUID) (*models.User, error)
+}
+
+type RedisRepository interface {
+	GetByIdCtx(ctx context.Context, key string) (*models.User, error)
+	SetUserCtx(ctx context.Context, key string, seconds int, user *models.User) error
+	DeleteUserCtx(ctx context.Context, key string) error
 }
 
 type Useсase interface {
