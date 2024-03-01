@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"github.com/Snorkin/auth_service/internal/user"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
@@ -24,7 +23,7 @@ type UserRepository struct {
 	db *sqlx.DB
 }
 
-func CreateUserPgRepo(db *sqlx.DB) user.PgRepository {
+func CreateUserPgRepo(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
