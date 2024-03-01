@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Snorkin/auth_service/internal/models"
-	"github.com/Snorkin/auth_service/internal/user"
 	"github.com/Snorkin/auth_service/pkg/grpc_errors"
-	"github.com/Snorkin/auth_service/pkg/logger"
 	"github.com/Snorkin/auth_service/pkg/utils"
 	"github.com/go-redis/redis/v8"
 	"time"
@@ -16,19 +14,17 @@ const (
 	prefix = "user:"
 )
 
-type userRedisRepo struct {
+type UserRedisRepo struct {
 	redisClient *redis.Client
-	logger      logger.Logger
 }
 
-func CreateUserRedisRepository(redisClient *redis.Client, logger logger.Logger) user.RedisRepository {
-	return &userRedisRepo{
+func CreateUserRedisRepository(redisClient *redis.Client) *UserRedisRepo {
+	return &UserRedisRepo{
 		redisClient: redisClient,
-		logger:      logger,
 	}
 }
 
-func (u *userRedisRepo) GetByIdCtx(ctx context.Context, key string) (*models.User, error) {
+func (u *UserRedisRepo) GetByIdCtx(ctx context.Context, key string) (*models.User, error) {
 	userBytes, err := u.redisClient.Get(ctx, utils.CreateKey(prefix, key)).Bytes()
 	if err != nil {
 		if err != redis.Nil {
@@ -43,7 +39,7 @@ func (u *userRedisRepo) GetByIdCtx(ctx context.Context, key string) (*models.Use
 	return checkUser, nil
 }
 
-func (u *userRedisRepo) SetUserCtx(ctx context.Context, key string, seconds int, user *models.User) error {
+func (u *UserRedisRepo) SetUserCtx(ctx context.Context, key string, seconds int, user *models.User) error {
 	userBytes, err := json.Marshal(user)
 	if err != nil {
 		return err
@@ -51,6 +47,6 @@ func (u *userRedisRepo) SetUserCtx(ctx context.Context, key string, seconds int,
 	return u.redisClient.Set(ctx, utils.CreateKey(prefix, key), userBytes, time.Second*time.Duration(seconds)).Err()
 }
 
-func (u *userRedisRepo) DeleteUserCtx(ctx context.Context, key string) error {
+func (u *UserRedisRepo) DeleteUserCtx(ctx context.Context, key string) error {
 	return u.redisClient.Del(ctx, utils.CreateKey(prefix, key)).Err()
 }
