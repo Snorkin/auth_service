@@ -33,7 +33,7 @@ func CreateAuthApp(logger logger.Logger, cfg *config.Config, db *sqlx.DB, redis 
 
 func (a *App) Run() error {
 	ic := interceptor.CreateInterceptor(a.logger, a.cfg)
-	userRepo := userRepository.NewUserPgRepo(a.db)
+	userRepo := userRepository.CreateUserPgRepo(a.db)
 	userUC := userUsecase.CreateUserUseCase(userRepo)
 
 	grpcServer := grpc.NewServer(
