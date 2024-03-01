@@ -2,6 +2,8 @@ package app
 
 import (
 	"github.com/Snorkin/auth_service/config"
+	sessRepository "github.com/Snorkin/auth_service/internal/session/repository"
+	sessUsecase "github.com/Snorkin/auth_service/internal/session/usecase"
 	userHandler "github.com/Snorkin/auth_service/internal/user/delivery/grpc"
 	userRepository "github.com/Snorkin/auth_service/internal/user/repository"
 	userUsecase "github.com/Snorkin/auth_service/internal/user/usecase"
@@ -34,7 +36,10 @@ func CreateAuthApp(logger logger.Logger, cfg *config.Config, db *sqlx.DB, redis 
 func (a *App) Run() error {
 	ic := interceptor.CreateInterceptor(a.logger, a.cfg)
 	userRepo := userRepository.CreateUserPgRepo(a.db)
-	userUC := userUsecase.CreateUserUseCase(userRepo)
+	sessRepo := sessRepository.CreateSessionRepository(a.redis)
+	userRedisRepo := userRepository.CreateUserRedisRepository(a.redis)
+	userUC := userUsecase.CreateUserUseCase(a.logger, userRepo, userRedisRepo)
+	sessUC := sessUsecase.CreateSessionUC(sessRepo)
 
 	grpcServer := grpc.NewServer(
 		grpc.KeepaliveParams(keepalive.ServerParameters{
@@ -48,7 +53,7 @@ func (a *App) Run() error {
 		reflection.Register(grpcServer)
 	}
 
-	authHandlerGRPC := userHandler.NewAuthHandlerGRPC(a.logger, a.cfg, userUC)
+	authHandlerGRPC := userHandler.CreateAuthHandlerGRPC(a.logger, a.cfg, userUC, sessUC)
 	grpcService.RegisterUserServiceServer(grpcServer, authHandlerGRPC)
 
 	listener, err := net.Listen("tcp", a.cfg.Server.Port)
