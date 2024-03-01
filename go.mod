@@ -11,6 +11,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/githubnemo/CompileDaemon v1.4.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
+	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
