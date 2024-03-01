@@ -3,9 +3,7 @@ package repository
 import (
 	"context"
 	"encoding/json"
-	"github.com/Snorkin/auth_service/config"
 	"github.com/Snorkin/auth_service/internal/models"
-	"github.com/Snorkin/auth_service/internal/session"
 	"github.com/Snorkin/auth_service/pkg/utils"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
@@ -17,16 +15,15 @@ const (
 	prefix = "session:"
 )
 
-type sessionRepo struct {
+type SessionRepo struct {
 	redisClient *redis.Client
-	cfg         *config.Config
 }
 
-func CreateSessionRepository(redisClient *redis.Client, cfg *config.Config) session.RedisRepository {
-	return &sessionRepo{redisClient: redisClient, cfg: cfg}
+func CreateSessionRepository(redisClient *redis.Client) *SessionRepo {
+	return &SessionRepo{redisClient: redisClient}
 }
 
-func (s *sessionRepo) CreateSession(ctx context.Context, session *models.Session, expire int) (string, error) {
+func (s *SessionRepo) CreateSession(ctx context.Context, session *models.Session, expire int) (string, error) {
 	session.Id = uuid.New().String()
 	sessionKey := utils.CreateKey(prefix, session.Id)
 
@@ -40,7 +37,7 @@ func (s *sessionRepo) CreateSession(ctx context.Context, session *models.Session
 	return session.Id, nil
 }
 
-func (s *sessionRepo) GetSessionById(ctx context.Context, sessionId string) (*models.Session, error) {
+func (s *SessionRepo) GetSessionById(ctx context.Context, sessionId string) (*models.Session, error) {
 	res, err := s.redisClient.Get(ctx, utils.CreateKey(prefix, sessionId)).Bytes()
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to get value by key")
@@ -52,13 +49,13 @@ func (s *sessionRepo) GetSessionById(ctx context.Context, sessionId string) (*mo
 	return sess, nil
 }
 
-func (s *sessionRepo) DeleteById(ctx context.Context, sessionId string) error {
+func (s *SessionRepo) DeleteById(ctx context.Context, sessionId string) error {
 	if err := s.redisClient.Del(ctx, utils.CreateKey(prefix, sessionId)).Err(); err != nil {
 		return errors.Wrap(err, "Unable to delete record by id")
 	}
 	return nil
 }
 
-//func (s *sessionRepo) CreateKey(sessionId string) string {
+//func (s *SessionRepo) CreateKey(sessionId string) string {
 //	return fmt.Sprintf("%s: %s", s.prefix, sessionId)
 //}
