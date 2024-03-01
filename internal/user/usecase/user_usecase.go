@@ -5,15 +5,24 @@ import (
 	"github.com/Snorkin/auth_service/internal/models"
 	"github.com/Snorkin/auth_service/internal/user"
 	"github.com/Snorkin/auth_service/pkg/grpc_errors"
+	"github.com/Snorkin/auth_service/pkg/logger"
+	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
+)
+
+const (
+	userCacheDuration = 3600
 )
 
 type UserUsecase struct {
-	userPgRepo user.PgRepository
+	logger        logger.Logger
+	userPgRepo    user.PgRepository
+	userRedisRepo user.RedisRepository
 }
 
-func CreateUserUseCase(userRepo user.PgRepository) user.Useсase {
-	return &UserUsecase{userPgRepo: userRepo}
+func CreateUserUseCase(logger logger.Logger, userRepo user.PgRepository, userRedisRepo user.RedisRepository) *UserUsecase {
+	return &UserUsecase{userPgRepo: userRepo, userRedisRepo: userRedisRepo, logger: logger}
 }
 
 func (u *UserUsecase) Register(ctx context.Context, user *models.User) (*models.User, error) {
@@ -38,6 +47,7 @@ func (u *UserUsecase) Login(ctx context.Context, email string, password string) 
 	return checkUser, nil
 }
 
+// FindByEmail TODO: implement cache
 func (u *UserUsecase) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	userCheck, err := u.userPgRepo.FindByEmail(ctx, email)
 	if err != nil {
@@ -48,6 +58,22 @@ func (u *UserUsecase) FindByEmail(ctx context.Context, email string) (*models.Us
 }
 
 func (u *UserUsecase) FindById(ctx context.Context, id uuid.UUID) (*models.User, error) {
-	//TODO implement me
-	panic("implement me")
+	cachedUser, err := u.userRedisRepo.GetByIdCtx(ctx, id.String())
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return nil, grpc_errors.ErrNotFound
+	}
+	if cachedUser != nil {
+		return cachedUser, nil
+	}
+
+	userCheck, err := u.userPgRepo.FindById(ctx, id)
+	if err != nil {
+		return nil, grpc_errors.ErrNotFound
+	}
+
+	if err := u.userRedisRepo.SetUserCtx(ctx, userCheck.UserID.String(), userCacheDuration, userCheck); err != nil {
+		u.logger.Errorf("Unable to set user to cache db")
+	}
+
+	return userCheck, nil
 }
